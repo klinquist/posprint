@@ -1,0 +1,16 @@
+{
+  "name": "posprint-local-client",
+  "version": "1.0.0",
+  "description": "Local subscriber that prints messages from AWS IoT Core to an ESC/POS printer.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test:send": "node test-message.js"
+  },
+  "dependencies": {
+    "@aws-sdk/client-iot": "^3.521.0",
+    "aws-iot-device-sdk-v2": "^1.15.0",
+    "escpos": "^2.5.2",
+    "escpos-network": "^3.0.0-alpha.5"
+  }
+}
