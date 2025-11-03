@@ -11,6 +11,7 @@
     "@aws-sdk/client-iot": "^3.521.0",
     "aws-iot-device-sdk-v2": "^1.15.0",
     "escpos": "^2.5.2",
-    "escpos-network": "^3.0.0-alpha.5"
+    "escpos-network": "^3.0.0-alpha.5",
+    "serialport": "^13.0.0"
   }
 }
