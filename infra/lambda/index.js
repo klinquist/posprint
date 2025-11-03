@@ -45,9 +45,6 @@ const buildResponse = (statusCode, body = {}) => ({
   statusCode,
   headers: {
     "Content-Type": "application/json",
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Headers": "content-type",
-    "Access-Control-Allow-Methods": "OPTIONS,POST",
   },
   body: JSON.stringify(body),
 });

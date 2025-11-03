@@ -160,7 +160,7 @@ resource "aws_lambda_function" "message_receiver" {
     variables = {
       DYNAMO_TABLE_NAME       = aws_dynamodb_table.messages.name
       DYNAMO_RATE_INDEX       = "sourceIp-receivedAt-index"
-      RATE_LIMIT_MAX_MESSAGES = "10"
+      RATE_LIMIT_MAX_MESSAGES = "4"
       RATE_LIMIT_WINDOW_HOURS = "24"
       IOT_ENDPOINT            = data.aws_iot_endpoint.this.endpoint_address
       IOT_TOPIC               = local.iot_topic
