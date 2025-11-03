@@ -5,9 +5,7 @@ const escpos = require("escpos");
 escpos.Network = require("escpos-network");
 
 const REGION =
-  process.env.AWS_REGION ||
-  process.env.AWS_DEFAULT_REGION ||
-  "us-east-1";
+  process.env.AWS_REGION || process.env.AWS_DEFAULT_REGION || "us-east-1";
 const TOPIC = process.env.IOT_TOPIC || "linquist/posprint";
 const PRINTER_HOST = process.env.PRINTER_HOST || "192.168.0.5";
 const PRINTER_PORT = Number(process.env.PRINTER_PORT || 9100);
@@ -21,7 +19,7 @@ const resolveEndpoint = async () => {
   const result = await iotClient.send(
     new DescribeEndpointCommand({
       endpointType: "iot:Data-ATS",
-    })
+    }),
   );
 
   if (!result.endpointAddress) {
@@ -40,9 +38,7 @@ const createConnection = async (endpoint) => {
       region: REGION,
     });
 
-  const clientId = `posprint-listener-${Math.floor(
-    Math.random() * 1_000_000
-  )}`;
+  const clientId = `posprint-listener-${Math.floor(Math.random() * 1_000_000)}`;
 
   configBuilder.with_endpoint(endpoint);
   configBuilder.with_client_id(clientId);
@@ -89,9 +85,7 @@ const wrapMessage = (message, width) => {
     return ["(no message provided)"];
   }
 
-  return normalized
-    .split("\n")
-    .flatMap((line) => wrapLine(line, width));
+  return normalized.split("\n").flatMap((line) => wrapLine(line, width));
 };
 
 const printJob = (email, message, receivedAt) =>
@@ -122,7 +116,7 @@ const printJob = (email, message, receivedAt) =>
 
         printer.encode("UTF-8").align("LT");
         lines.forEach((line) => printer.text(line));
-        printer.feed(3).close((closeErr) => {
+        printer.feed(6).close((closeErr) => {
           if (closeErr) {
             reject(closeErr);
             return;
@@ -142,9 +136,7 @@ const printJob = (email, message, receivedAt) =>
 
 const handleMessage = async (topic, payload) => {
   try {
-    const data = JSON.parse(
-      Buffer.from(payload).toString("utf8")
-    );
+    const data = JSON.parse(Buffer.from(payload).toString("utf8"));
 
     if (!data || typeof data !== "object") {
       console.warn("Received empty payload.");
@@ -185,7 +177,7 @@ const main = async () => {
         "Connection resumed:",
         returnCode,
         "sessionPresent:",
-        sessionPresent
+        sessionPresent,
       );
     });
 
