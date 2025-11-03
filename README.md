@@ -40,7 +40,7 @@ Local Printer Client
 
 1. Fetch AWS IoT Core endpoint using IAM credentials (default region `us-east-1`).
 2. Connect to the `linquist/posprint` topic over secure WebSockets.
-3. Receive JSON messages containing `email`, `message`, and `receivedAt`.
+3. Receive JSON messages containing `contact`, `message`, and `receivedAt`.
 4. Wrap text to 42 columns, preserve multiline content, and print via ESC/POS (network printer at `192.168.0.5:9100` by default).
 5. Append a separator line and feed three blank lines after each message.
 
@@ -75,7 +75,7 @@ npm run test:send
 Environment variables:
 
 - `FUNCTION_URL` *(required)* – the Lambda Function URL.
-- `TEST_EMAIL` – override default `test@example.com`.
+- `TEST_CONTACT` – override default `"Test User"`.
 - `TEST_MESSAGE` – override default multiline content.
 
 API Documentation
@@ -92,12 +92,12 @@ Request Body (JSON)
 
 ```
 {
-  "email": "sender@example.com",
+  "contact": "sender@example.com",
   "message": "Hello world\nThis is multiline."
 }
 ```
 
-- `email` *(string, required)* – sender’s email (basic non-empty validation); trimming applied.
+- `contact` *(string, required)* – free-form contact info (name, email, link, etc.), trimmed, non-empty.
 - `message` *(string, required)* – message content, trimmed, maximum 1024 characters. Multiline supported via `\n`.
 
 Rate Limiting

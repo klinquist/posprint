@@ -8,12 +8,12 @@ if (!functionUrl) {
   process.exit(1);
 }
 
-const email = process.env.TEST_EMAIL || "test@example.com";
+const contact = process.env.TEST_CONTACT || "Test User";
 const message =
   process.env.TEST_MESSAGE ||
   "Hello from the POS print test!\nThis is a multi-line message.\nEnjoy!";
 
-const payload = JSON.stringify({ email, message });
+const payload = JSON.stringify({ contact, message });
 
 const url = new URL(functionUrl);
 

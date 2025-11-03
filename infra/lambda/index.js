@@ -88,13 +88,14 @@ exports.handler = async (event) => {
     return buildResponse(400, { message: "Invalid JSON body." });
   }
 
-  const email = typeof payload.email === "string" ? payload.email.trim() : "";
+  const contact =
+    typeof payload.contact === "string" ? payload.contact.trim() : "";
   const message =
     typeof payload.message === "string" ? payload.message.trim() : "";
 
-  if (!email || !message) {
+  if (!contact || !message) {
     return buildResponse(400, {
-      message: "Both email and message are required.",
+      message: "Both contact info and message are required.",
     });
   }
 
@@ -163,7 +164,7 @@ exports.handler = async (event) => {
   const item = {
     messageId: randomUUID(),
     receivedAt,
-    email,
+    contact,
     sourceIp,
     message,
   };
@@ -193,7 +194,7 @@ exports.handler = async (event) => {
         qos: 0,
         payload: Buffer.from(
           JSON.stringify({
-            email,
+            contact,
             message,
             receivedAt,
           })

@@ -88,7 +88,7 @@ const wrapMessage = (message, width) => {
   return normalized.split("\n").flatMap((line) => wrapLine(line, width));
 };
 
-const printJob = (email, message, receivedAt) =>
+const printJob = (contact, message, receivedAt) =>
   new Promise((resolve, reject) => {
     const device = new escpos.Network(PRINTER_HOST, PRINTER_PORT);
     const separator = repeatChar("-", PRINTER_WIDTH);
@@ -106,7 +106,7 @@ const printJob = (email, message, receivedAt) =>
 
       try {
         const lines = [
-          `From: ${email}`,
+          `From: ${contact}`,
           `Received: ${receivedAt}`,
           "",
           ...messageLines,
@@ -143,15 +143,15 @@ const handleMessage = async (topic, payload) => {
       return;
     }
 
-    const { email, message, receivedAt } = data;
+    const { contact, message, receivedAt } = data;
 
-    if (!email || !message) {
+    if (!contact || !message) {
       console.warn("Skipping payload with missing fields:", data);
       return;
     }
 
-    await printJob(email, message, receivedAt || new Date().toISOString());
-    console.log("Printed message from", email);
+    await printJob(contact, message, receivedAt || new Date().toISOString());
+    console.log("Printed message from", contact);
   } catch (error) {
     console.error("Failed to process message:", error);
   }
