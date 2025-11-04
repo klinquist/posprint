@@ -12,7 +12,9 @@ Repository Layout
 - `local/` – Node.js utilities for running the home printer client and testing the Lambda URL.
   - `index.js` – Subscribes to the IoT topic using `aws-iot-device-sdk-v2` and prints messages to the networked Epson printer.
   - `test-message.js` – Sends sample requests to the Lambda Function URL for end-to-end testing.
-- `index.js` – (Existing in repo root) Current site/application code (unchanged by this work).
+- `stream.sh` - shell script to stream from RTSP to Youtube but only between hours that I'm awake.
+
+
 
 Infrastructure Overview
 -----------------------
