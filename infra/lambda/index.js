@@ -1,7 +1,5 @@
 const { randomUUID } = require("crypto");
-const {
-  DynamoDBClient,
-} = require("@aws-sdk/client-dynamodb");
+const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");
 const {
   DynamoDBDocumentClient,
   PutCommand,
@@ -21,7 +19,7 @@ const dynamo = DynamoDBDocumentClient.from(
     marshallOptions: {
       removeUndefinedValues: true,
     },
-  }
+  },
 );
 
 let cachedIotClient;
@@ -79,6 +77,20 @@ exports.handler = async (event) => {
     return buildResponse(204);
   }
 
+  // Check if it's sleep time (9PM - 6AM Pacific Time)
+  const now = new Date();
+  const pacificTime = new Date(
+    now.toLocaleString("en-US", { timeZone: "America/Los_Angeles" }),
+  );
+  const hour = pacificTime.getHours();
+  if (hour >= 21 || hour < 6) {
+    // HTTP 418 I'm a teapot - because even the server needs sleep!
+    return buildResponse(418, {
+      message:
+        "I'm a teapot (currently sleeping). Please try again between 6AM and 9PM Pacific Time.",
+    });
+  }
+
   let payload;
 
   try {
@@ -99,9 +111,33 @@ exports.handler = async (event) => {
     });
   }
 
-  if (message.length > 1024) {
+  // Validate contact length
+  if (contact.length > 64) {
     return buildResponse(400, {
-      message: "Message is too long. Maximum length is 1024 characters.",
+      message: "Contact info is too long. Maximum length is 64 characters.",
+    });
+  }
+
+  // Validate message length
+  if (message.length > 512) {
+    return buildResponse(400, {
+      message: "Message is too long. Maximum length is 512 characters.",
+    });
+  }
+
+  // Validate only low-ASCII characters (0-127) for contact
+  if (!/^[\x00-\x7F]*$/.test(contact)) {
+    return buildResponse(400, {
+      message:
+        "Contact info contains invalid characters. Only ASCII characters are allowed.",
+    });
+  }
+
+  // Validate only low-ASCII characters (0-127) for message
+  if (!/^[\x00-\x7F]*$/.test(message)) {
+    return buildResponse(400, {
+      message:
+        "Message contains invalid characters. Only ASCII characters are allowed.",
     });
   }
 
@@ -115,11 +151,11 @@ exports.handler = async (event) => {
 
   const rateLimitMax = parsePositiveInt(
     process.env.RATE_LIMIT_MAX_MESSAGES,
-    10
+    4,
   );
   const rateLimitWindowHours = parsePositiveInt(
     process.env.RATE_LIMIT_WINDOW_HOURS,
-    24
+    24,
   );
   const rateLimitIndex = process.env.DYNAMO_RATE_INDEX;
 
@@ -129,7 +165,7 @@ exports.handler = async (event) => {
   }
 
   const windowStart = new Date(
-    Date.now() - rateLimitWindowHours * 60 * 60 * 1000
+    Date.now() - rateLimitWindowHours * 60 * 60 * 1000,
   ).toISOString();
 
   try {
@@ -148,7 +184,7 @@ exports.handler = async (event) => {
           ":windowStart": windowStart,
         },
         Select: "COUNT",
-      })
+      }),
     );
 
     if ((queryResult.Count || 0) >= rateLimitMax) {
@@ -174,7 +210,7 @@ exports.handler = async (event) => {
       new PutCommand({
         TableName: process.env.DYNAMO_TABLE_NAME,
         Item: item,
-      })
+      }),
     );
   } catch (err) {
     console.error("Failed to store message", { error: err });
@@ -197,9 +233,9 @@ exports.handler = async (event) => {
             contact,
             message,
             receivedAt,
-          })
+          }),
         ),
-      })
+      }),
     );
   } catch (err) {
     console.error("Failed to publish to IoT Core", { error: err });
