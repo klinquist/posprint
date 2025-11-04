@@ -52,30 +52,26 @@ const parsePositiveInt = (value, fallback) => {
   return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
 };
 
-const resolveSourceIp = (event) => {
-  const forwarded =
-    event?.headers?.["x-forwarded-for"] ||
-    event?.headers?.["X-Forwarded-For"] ||
-    event?.headers?.["X-FORWARDED-FOR"];
-
-  if (typeof forwarded === "string" && forwarded.trim().length > 0) {
-    const [first] = forwarded.split(",");
-    if (first && first.trim().length > 0) {
-      return first.trim();
-    }
-  }
-
-  return (
-    event?.requestContext?.http?.sourceIp ||
-    event?.requestContext?.identity?.sourceIp ||
-    null
-  );
-};
+const resolveSourceIp = (event) =>
+  event?.requestContext?.http?.sourceIp ||
+  event?.requestContext?.identity?.sourceIp ||
+  null;
 
 exports.handler = async (event) => {
   if (event?.requestContext?.http?.method === "OPTIONS") {
     return buildResponse(204);
   }
+
+  const sourceIp = resolveSourceIp(event);
+  if (!sourceIp) {
+    console.warn("Request received without a resolvable source IP.");
+    return buildResponse(400, {
+      message:
+        "Unable to determine caller IP address. Please try again later.",
+    });
+  }
+
+  console.log("Request received", { sourceIp });
 
   // Check if it's sleep time (9PM - 6AM Pacific Time)
   const now = new Date();
@@ -142,12 +138,6 @@ exports.handler = async (event) => {
   }
 
   const receivedAt = new Date().toISOString();
-  const sourceIp = resolveSourceIp(event);
-
-  if (!sourceIp) {
-    console.warn("Unable to determine source IP for request.");
-    return buildResponse(400, { message: "Unable to determine source IP." });
-  }
 
   const rateLimitMax = parsePositiveInt(
     process.env.RATE_LIMIT_MAX_MESSAGES,

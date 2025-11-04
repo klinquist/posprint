@@ -100,11 +100,11 @@ Request Body (JSON)
 ```
 
 - `contact` *(string, required)* – free-form contact info (name, email, link, etc.), trimmed, non-empty.
-- `message` *(string, required)* – message content, trimmed, maximum 1024 characters. Multiline supported via `\n`.
+- `message` *(string, required)* – message content, trimmed, maximum 512 characters. Multiline supported via `\n`.
 
 Rate Limiting
 
-- Based on source IP (from `X-Forwarded-For` or Lambda context).
+- Based on source IP derived from the Lambda request context.
 - Defaults: 10 messages per 24 hours (configurable via environment variables).
 - Exceeding the limit returns HTTP 429 with JSON body `{ "message": "Rate limit exceeded. Please try again later." }`.
 
