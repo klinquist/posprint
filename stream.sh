@@ -16,7 +16,7 @@ while true; do
     -map 0:v:0 -map 1:a:0 \
     -c:v libx264 -preset veryfast -pix_fmt yuv420p \
     -g 60 -r 30 \
-    -b:v 2500k -maxrate 3000k -bufsize 6000k \
+    -b:v 1000k -maxrate 1200k -bufsize 2400k \
     -c:a aac -b:a 128k -ar 44100 -ac 2 \
     -f flv "$YT_RTMP" || true
 
