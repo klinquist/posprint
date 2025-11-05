@@ -113,7 +113,11 @@ const printJob = (contact, message, receivedAt) =>
           "",
           separator,
         ];
-
+        try {
+          printer.cut();
+        } catch (cutErr) {
+          console.error("Failed to cut paper:", cutErr);
+        }
         printer.encode("UTF-8").align("LT");
         lines.forEach((line) => printer.text(line));
         printer.feed(6).close((closeErr) => {
